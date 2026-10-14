@@ -1,0 +1,32 @@
+window.OC={asof:"Oct 13–14, 2026",assets:{
+SUI:{v:"confirms",tag:"Confirms long (mild)",sum:"Fundamental money is coming in, but it's small, and on-chain activity is rising. Derivatives aren't overheated. ETF size is tiny, so on-chain alone can't carry the trade.",ev:[
+["ETF flows","+$1.7M into 21Shares TSUI on Oct 8; flat on Oct 9–13. All 3 SUI ETFs (GSUI/SUIS/TSUI) have taken in about +$7.9M since late Aug. Small, but they're mostly buyers. Ali Charts counts 5 straight weeks of inflows (~14M SUI).","https://cryptoetf.today/en/sui-etf-flows","Oct 13"],
+["Network growth","Sui DEX volume is up ~196% over 30 days ($293M/7d). TVL is $512M (+12.6% over 30d), and stablecoins on Sui are $514M (+7.3% over 30d).","https://defillama.com/chain/sui","Oct 13"],
+["Network effect","Samsung Wallet is integrating Sui to bring USDC to 82M US Galaxy devices. Sui Foundation put $30M into DATA Network, which is moving to Sui.","https://x.com/EmanAbio/status/2109497402847797270","Oct 12"],
+["Funding / OI","Funding is slightly positive (~+11% annualized) and OI is ~$61M, so it isn't a crowded long.","https://marketradarwhale.com/en/coin/SUI/2026-10-13/","Oct 13"],
+["Whales","Mixed: 2.34M SUI withdrawn from Bybit (bullish), and 3.0M SUI sent to Bitfinex (possible sell). It nets to about even.","https://x.com/_OnChainWatch/status/2110064092434104572","Oct 13"],
+["Unlocks","Oct 1 unlock was 13.3M SUI (0.32%), already absorbed. Next one is Nov 1. The staking-reward cut is Thursday.","https://tokenomist.ai/sui/unlock-events","Oct 14"],
+["Sentiment (contrarian)","'SUI is dead' / 'can't even double' replies alongside 'spring-loaded' threads. That's split, not full capitulation.","https://x.com/Haz182_/status/2109349248936665451","Oct 11"]]},
+AVAX:{v:"confirms",tag:"Confirms long (best on-chain of the 5)",sum:"Biggest on-chain growth of the group, plus negative funding (shorts paying longs) and the strongest ETF day since April. Watch the Oct 24 Foundation unlock.",ev:[
+["ETF flows","Oct 8: +$2.52M, the biggest day since April (VAVX/BAVA/GAVA). Week +$2.5M, month +$5.5M, +$31.6M since launch. ETFs hold ~1.3% of supply.","https://kryptoliczby.com/en/etf-avalanche/","Oct 12"],
+["TVL growth","Avalanche TVL is $615M, +31.9% over 30d and +40% over 90d. DEX volume is +115% over 30d ($866M/7d).","https://defillama.com/chain/avalanche","Oct 13"],
+["Funding / positioning","Funding is negative (−21% annualized) and the tracked big perp wallets are mostly short (3 long vs 7 short). That's fuel for a squeeze if price breaks up.","https://marketradarwhale.com/en/coin/AVAX/2026-10-13/","Oct 13"],
+["Stablecoins","Stablecoins on Avalanche are $1.41B, −5% over 30d. That's the one soft spot.","https://defillama.com/stablecoins/chains","Oct 13"],
+["Active addresses","C-Chain active addresses are ~24.9k (7-day average), ~352k monthly.","https://www.theblock.co/data/on-chain-metrics/avalanche/number-of-active-addresses-on-avalanche-7dma","Oct 12"],
+["Unlocks","Oct 24: 1.67M AVAX (~$17M, 0.38% of circ), to the Foundation. Small, but it lands right before the Fed.","https://defillama.com/unlocks/avalanche","Oct 13"]]},
+XRP:{v:"neutral",tag:"Neutral (leans long)",sum:"Steady ETF buying and whales pulling coins off exchanges, but exchange deposits are far bigger, so there's no real supply squeeze yet.",ev:[
+["ETF flows","+$11.31M for the week of Oct 5–9, the 13th straight inflow week (Bitwise +$10.55M). Net assets are $1.57B, ~1.8% of market cap. This happened while BTC/ETH/SOL ETFs bled about $1.25B.","https://www.kucoin.com/news/flash/xrp-spot-etfs-see-11-3m-net-inflow-in-week-of-october-5-9","Oct 12"],
+["Whales","Santiment: wallets holding 10–100M XRP grew from 12.48B to 13.8B XRP (Sep 6 → Oct 6).","https://beincrypto.com/xrp-bullish-signals-october-2026/","Oct 2026"],
+["Exchange flows","~105M XRP withdrawn from Binance/Upbit, but 1.6B XRP was deposited at Binance, so reserves only fell ~2.7%. Price dropped 9% anyway.","https://coinliva.com/xrp-deposits-at-1-6b-dwarf-the-105m-withdrawals-everyone-n1205","Oct 2026"],
+["On-chain DeFi","XRPL TVL is only $41M and stablecoins are $1.1B (−2% over 30d). Thin DeFi use.","https://defillama.com/chain/xrpl","Oct 13"]]},
+SOL:{v:"contradicts",tag:"Contradicts long (for now)",sum:"Smart money is leaving: record ETF outflows, a big holder dumping to exchanges, and flat on-chain growth. Stay on the watch list until the flows turn.",ev:[
+["ETF flows","6 straight outflow days. −$24.8M in the week to Oct 9, a record weekly outflow, ending a 14-week inflow streak. Bitwise BSOL accounted for 84% of it.","https://www.theblock.co/news/markets/2026-10-10-ether-etfs-extend-outflow-streak-to-nine-days-as-solana-funds-snap-record-14-week-inflow-run-418215","Oct 10"],
+["Smart-money selling","SkyAI (holds 2M+ SOL) sent 568K SOL ($63.9M) to exchanges at a loss vs its $194 average. Separately, a 956K SOL ($116M) unstake.","https://www.lookonchain.com/feeds/76195","Oct 2026"],
+["Network","TVL is $6.0B, only +3.8% over 30d. Stablecoins $16.4B (+0.9%). DEX volume is +27% over 30d, which is OK but lags SUI and AVAX.","https://defillama.com/chain/solana","Oct 13"],
+["Flip trigger","Turns to 'confirms' when ETF flows go back positive for a week and price closes above $124.6.","https://cryptoetf.today/en/solana-etf-flows","Oct 13"]]},
+MARA:{v:"neutral",tag:"Neutral",sum:"Good: MARA bought BTC again and has a big short base that could squeeze. Bad: miner margins are squeezed and it sold ~23K BTC this year. It's still a leveraged BTC bet, so wait for the $9.27 close.",ev:[
+["Treasury flip","Arkham and Lookonchain both tracked MARA buying 1,292 BTC (~$98.6M at $76.3K) via FalconX in mid-Sep, after selling 20,880 BTC in Q1 and 2,213 in Q2. MARA hasn't confirmed it.","https://www.financialmarkets.com/article/two-independent-on-chain-trackers-say-mara-bought-1292-bitcoin-into-the-drawdown","Sep 16"],
+["Short interest","100.8M shares short, ~26% of float, 2.2 days to cover (Sep 30 settlement). That's squeeze fuel if BTC reclaims $87.4K. Next report is Oct 26.","https://www.marketbeat.com/stocks/NASDAQ/MARA/short-interest/","Sep 30"],
+["Hashprice","~$39.6/PH/day, with network hashrate ~1,013 EH/s at record levels. Thin miner margins mean selling pressure across the sector.","https://hashrateindex.com/","Oct 14"],
+["Holdings","35,577 BTC at Jun 30, 9,270 of it loaned or pledged. Every $10K move in BTC ≈ $350M to its P&L.","https://ml.globenewswire.com/Resource/Download/20012703-ca39-4465-acd3-cbd840a78e46","Aug 2026"]]}
+}};

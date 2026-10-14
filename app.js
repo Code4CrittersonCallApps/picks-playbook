@@ -6,7 +6,7 @@ function status(p){if(p.etype==='trigger')return p.triggered?(p.Rlive<1.5?'Alrea
  return p.triggered?'At the boarding level (EMA21) — live':'Extended '+pct(p.px,p.entry)+' above boarding level — wait for pullback to EMA21'}
 function home(){document.title='Picks Playbook';
  let h=`<header><h1>Picks Playbook</h1><p class=sub>9 picks ranked · prices as of ${picks[0].asof} · BTC $${f(meta.btc)}</p></header>
- <div class=card warn><b>Tonight's risk:</b> CPI Wed Oct 14, 8:30 AM ET. BTC ${f(meta.btc)} sits between $80k support and the $87.4k reclaim. Under $80k → no new alt longs. Over $87.4k → alts get the green light.</div><div class=dbtn><a href="#draft">🏈 Draft Board / Watch List</a><a href="#catalysts">📅 Catalysts</a></div><ol class=rank>`;
+ <div class=card warn><b>Tonight's risk:</b> CPI Wed Oct 14, 8:30 AM ET. BTC ${f(meta.btc)} sits between $80k support and the $87.4k reclaim. Under $80k → no new alt longs. Over $87.4k → alts get the green light.</div>${ochome()}<div class=dbtn><a href="#draft">🏈 Draft Board / Watch List</a><a href="#catalysts">📅 Catalysts</a></div><ol class=rank>`;
  picks.forEach((p,i)=>{h+=`<li><a href="#${p.sym}"><span class=n>${i+1}</span><div><b>${p.sym}</b> <span class="tag ${p.ctier}">${p.kind==='train'?'Train':p.ctier+' chart'}</span>${p.ftier?`<span class="tag box">${p.score}/5 boxes</span>`:''}<br><small>${where(p)} · R ${p.R0} · ${status(p)}</small></div></a></li>`});
  h+=`</ol><div class=card><b>QQQ (also a train):</b> $${f(meta.qqq.px)}, board ${f(meta.qqq.board)}, stop ${f(meta.qqq.stop)}, target ${f(meta.qqq.tgt)}, R ${meta.qqq.R}. Fine as the "boring" Schwab train; less room to run than the rest.</div>
  <div class=card><b>How the rank works:</b> chart tier (S=3, A/Train=2) + box score (out of 2) + reward/risk (max 2) + 1 if on both Ez Buys and Trains + 0.5 if all 4 train checks pass today. Analog matches are historical look-alikes, not predictions.</div><p class=foot>Built ${meta.built}. Not financial advice.</p>`;
@@ -28,7 +28,7 @@ function lesson(p){document.title=p.sym+' · Picks Playbook';const i=picks.index
  <section><h2>2 · The setup, as a lesson</h2><p>${p.kind==='train'?`<b>Pattern: a train already moving.</b> Price is making new highs with the 21 EMA above the 55 and rising. The trick is to board on the pullback to the 21 EMA, not at the top of a candle.`:`<b>Pattern: a breakout trigger.</b> Its last 100 days look ${p.sim}% like past setups that broke up. The trigger is a daily close above ${f(p.entry)}; until then it's just a pattern.`}</p>
  <ul class=crit>${crit}</ul>${an}${p.alsoTrain?`<p class=small>Also on Trains leaving now: board ${f(p.alsoTrain.board)}, stop ${f(p.alsoTrain.stop)}, target ${f(p.alsoTrain.tgt)} (R ${p.alsoTrain.R}).</p>`:''}
  <div class=reads><div><b>Krown-style</b>${krown}</div><div><b>BCB-style</b>${bcb}</div><div><b>Fous-style</b>${fous}</div></div><p class=small>These are rule-based reads in each style, not quotes.</p></section>
- <section><h2>3 · Ticket boxes</h2>${boxes}</section>
+ ${ocsec(p.sym)}<section><h2>3 · Ticket boxes</h2>${boxes}</section>
  <section><h2>4 · The plan</h2><table class=plan>
  <tr><td>Entry</td><td>${p.etype==='trigger'?'Daily close above':'Pull back to EMA21 ≈'} <b>${f(p.entry)}</b></td></tr>
  <tr><td>Stop</td><td><b class=red>${f(p.stop)}</b> (${pct(p.stop,p.entry)})</td></tr>
@@ -79,7 +79,11 @@ function mkAn(p){const cv=$('#anc'),a=p.an;
  cv._draw=draw;draw();obs(cv)}
 const RO=new ResizeObserver(es=>requestAnimationFrame(()=>es.forEach(e=>{const c=e.target.querySelector('canvas');if(c&&c._draw&&c.parentElement.clientWidth!==c._w){c._w=0;c._draw()}})));
 function obs(cv){RO.observe(cv.parentElement)}
-function route(){RO.disconnect();const s=location.hash.slice(1);if(s==='draft')return draft();if(s==='catalysts')return cats();const p=picks.find(q=>q.sym===s);p?lesson(p):home()}
+function ocsec(sym){const o=(window.OC||{}).assets&&OC.assets[sym];if(!o)return'';const c={confirms:'#2ea043',neutral:'#d29922',contradicts:'#f85149'}[o.v];
+return `<section><h2>On-chain &amp; smart money</h2><p><b style="color:${c}">${o.tag}</b> <small>· ${OC.asof}</small></p><p class=small>${o.sum}</p><ul class=small style="padding-left:18px">${o.ev.map(([k,t,u,d])=>`<li style="margin-bottom:6px"><b>${k}:</b> ${t} <a href="${u}" target=_blank rel=noopener>source</a> <small>(${d})</small></li>`).join('')}</ul></section>`}
+function ocpage(sym){document.title=sym+' on-chain';$('#app').innerHTML=`<nav><a href="#">← All picks</a><span>Watch list</span></nav><section class="card verdict"><h1>${sym}</h1><p>Schwab/Uphold watch-list coin, on-chain check only (no chart lesson yet).</p></section>`+ocsec(sym);scrollTo(0,0)}
+function ochome(){return `<div class=card><b>On-chain check (${OC.asof}):</b> ${Object.entries(OC.assets).map(([k,o])=>`<a href="#${picks.find(p=>p.sym===k)?k:'oc-'+k}">${k}</a> ${o.v==='confirms'?'✅':o.v==='neutral'?'🟡':'🔴'}`).join(' · ')}</div>`}
+function route(){RO.disconnect();const s=location.hash.slice(1);if(s==='draft')return draft();if(s==='catalysts')return cats();if(s.startsWith('oc-'))return ocpage(s.slice(3));const p=picks.find(q=>q.sym===s);p?lesson(p):home()}
 addEventListener('hashchange',route);route();
 function draft(){document.title='Draft Board · Picks Playbook';const{watch,cat}=WB;const g=(v)=>v==null?'—':f(v);
  const L=(t,u)=>u?`<a href="${u}" target=_blank rel=noopener>${t}</a>`:t;
