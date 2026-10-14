@@ -41,16 +41,17 @@ function lesson(p){document.title=p.sym+' · Picks Playbook';const i=picks.index
  <section class="card warn"><h2>5 · Risk</h2><p><b>CPI Wed Oct 14, 8:30 AM ET.</b> BTC has swung −9% to +11% around hot/cool CPI prints. Don't enter before the print; let the first daily close after it decide.</p><p><b>BTC $${f(meta.btc)}:</b> hold $80k or the alt longs are off. Reclaim $87.4k and the risk-on case firms up. ${p.kind!=='coin'&&p.sym!=='NVDA'?'This name moves with BTC, often 2–3× harder.':p.sym==='NVDA'?'NVDA tracks the Nasdaq/AI trade more than BTC; CPI hits it through rates.':'Alts move harder than BTC both ways.'}</p></section>
  <nav class=pn>${prev?`<a href="#${prev.sym}">← ${prev.sym}</a>`:'<span></span>'}${next?`<a href="#${next.sym}">${next.sym} →</a>`:'<a href="#">Index</a>'}</nav>`;
  $('#app').innerHTML=h;scrollTo(0,0);mkChart(p);if(p.an)mkAn(p)}
+let PFLIP=localStorage.getItem('flip_on')==='1';
 const LAY={EMAs:1,'200D':1,Fibs:1,'S/R':1,Trend:1,Plan:1,Labels:1};
 function sizeCv(cv){const w=cv.parentElement.clientWidth,h=Math.round(Math.min(Math.max(w*0.8,260),460)),d=devicePixelRatio||1;
  if(cv._w===w&&cv._h===h)return null;cv._w=w;cv._h=h;cv.width=w*d;cv.height=h*d;cv.style.height=h+'px';const x=cv.getContext('2d');x.setTransform(d,0,0,d,0,0);return x}
 function mkChart(p){const cv=$('#c');let hover=null;
- $('#tog').innerHTML=Object.keys(LAY).map(k=>`<button class="${LAY[k]?'on':''}" data-k="${k}">${k}</button>`).join('');
- $('#tog').onclick=e=>{const k=e.target.dataset.k;if(!k)return;LAY[k]^=1;e.target.classList.toggle('on');cv._w=0;draw()};
+ $('#tog').innerHTML=Object.keys(LAY).map(k=>`<button class="${LAY[k]?'on':''}" data-k="${k}">${k}</button>`).join('')+`<button data-flip=1 class="${PFLIP?'on':''}" style="${PFLIP?'background:#9e6a03':''}">🙃 Flip</button>`+(PFLIP?'<b style="background:#da3633;color:#fff;padding:4px 8px;border-radius:8px;font-size:11px">FLIPPED</b>':'');
+ $('#tog').onclick=e=>{if(e.target.dataset.flip){PFLIP=!PFLIP;localStorage.setItem('flip_on',PFLIP?'1':'0');mkChart(p);if(p.an)mkAn(p);return}const k=e.target.dataset.k;if(!k)return;LAY[k]^=1;e.target.classList.toggle('on');cv._w=0;draw()};
  const B=p.bars,n=B.length;
  function draw(){sizeCv(cv);const x=cv.getContext('2d'),W=cv._w,H=cv._h,R=54,T=8,Bm=18;
   let lo=Math.min(...B.map(b=>b[3]),p.stop),hi=Math.max(...B.map(b=>b[2]),p.tgt);const pad=(hi-lo)*.04;lo-=pad;hi+=pad;
-  const X=i=>(i+.5)*(W-R)/n,Y=v=>T+(hi-v)/(hi-lo)*(H-T-Bm),cw=Math.max(1,(W-R)/n*.7);
+  const X=i=>(i+.5)*(W-R)/n,Y=v=>T+(PFLIP?(v-lo):(hi-v))/(hi-lo)*(H-T-Bm),cw=Math.max(1,(W-R)/n*.7);
   x.clearRect(0,0,W,H);x.font='10px system-ui';const used=[Y(p.px)];
   const hl=(v,col,txt,dash)=>{if(v<lo||v>hi)return;x.strokeStyle=col;x.setLineDash(dash||[]);x.beginPath();x.moveTo(0,Y(v));x.lineTo(W-R,Y(v));x.stroke();x.setLineDash([]);const yy=Y(v);if(used.some(u=>Math.abs(u-yy)<11))return;used.push(yy);x.fillStyle=col;x.fillText(txt,W-R+3,yy+3)};
   if(LAY.Plan){used.push(Y(p.entry),Y(p.stop),Y(p.tgt))}
@@ -58,21 +59,21 @@ function mkChart(p){const cv=$('#c');let hover=null;
    for(const k of['0.382','0.5','0.618','0.702','0.786'])hl(p.fib[k],k==='0.702'||k==='0.786'?'#c9a2ff':'#776',(k==='0.618'?'GP ':'')+'.'+k.slice(2)+' '+f(p.fib[k]),[2,3])}
   if(LAY['S/R']){p.res.forEach(v=>hl(v,'#e66','R '+f(v),[6,3]));p.sup.forEach(v=>hl(v,'#5c9','S '+f(v),[6,3]))}
   x.setLineDash([]);
-  B.forEach((b,i)=>{const up=b[4]>=b[1];x.strokeStyle=x.fillStyle=up?'#3ecf8e':'#f0616d';x.beginPath();x.moveTo(X(i),Y(b[2]));x.lineTo(X(i),Y(b[3]));x.stroke();const y1=Y(Math.max(b[1],b[4])),y2=Y(Math.min(b[1],b[4]));x.fillRect(X(i)-cw/2,y1,cw,Math.max(1,y2-y1))});
+  B.forEach((b,i)=>{const up=(b[4]>=b[1])!==PFLIP;x.strokeStyle=x.fillStyle=up?'#3ecf8e':'#f0616d';x.beginPath();x.moveTo(X(i),Y(b[2]));x.lineTo(X(i),Y(b[3]));x.stroke();const y1=Math.min(Y(b[1]),Y(b[4])),y2=Math.max(Y(b[1]),Y(b[4]));x.fillRect(X(i)-cw/2,y1,cw,Math.max(1,y2-y1))});
   const line=(arr,col)=>{x.strokeStyle=col;x.lineWidth=1.5;x.beginPath();let s=0;arr.forEach((v,i)=>{if(v==null)return;s?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v));s=1});x.stroke();x.lineWidth=1};
   if(LAY.EMAs){line(p.e21,'#4da3ff');line(p.e55,'#ff9f43')}if(LAY['200D'])line(p.m200,'#ddd');
   if(LAY.Trend&&p.tl){x.strokeStyle='#5c9';x.lineWidth=1.5;x.beginPath();x.moveTo(X(p.tl[0]),Y(p.tl[1]));x.lineTo(X(p.tl[2]),Y(p.tl[3]));x.stroke();x.lineWidth=1}
-  if(LAY.Labels){x.textAlign='center';p.lab.forEach(([i,v,t,h])=>{x.fillStyle=t[0]==='H'&&t[1]==='H'||t==='HL'?'#8fe3b8':'#f59aa2';x.fillText(t,X(i),h?Y(v)-4:Y(v)+11)});x.textAlign='left'}
+  if(LAY.Labels){x.textAlign='center';p.lab.forEach(([i,v,t,h])=>{if(PFLIP)t=t.replace(/[HL]/g,c=>c=='H'?'L':'H');x.fillStyle=t[0]==='H'&&t[1]==='H'||t==='HL'?'#8fe3b8':'#f59aa2';x.fillText(t,X(i),(h!==PFLIP)?Y(v)-4:Y(v)+11)});x.textAlign='left'}
   if(LAY.Plan){used.length=0;used.push(Y(p.px));hl(p.entry,'#4da3ff','ENTRY '+f(p.entry));hl(p.stop,'#f0616d','STOP '+f(p.stop));hl(p.tgt,'#3ecf8e','TGT '+f(p.tgt))}
   x.fillStyle='#ffd166';x.fillText('▶'+f(p.px),W-R+2,Y(p.px)+3);
   x.fillStyle='#889';[0,Math.floor(n/2),n-1].forEach(i=>{const d=new Date(B[i][0]*1e3).toISOString().slice(5,10);x.fillText(d,Math.min(X(i),W-R-30),H-4)});
   if(hover!=null){const b=B[hover];x.strokeStyle='#fff6';x.beginPath();x.moveTo(X(hover),0);x.lineTo(X(hover),H-Bm);x.stroke();x.fillStyle='#000c';x.fillRect(4,4,190,30);x.fillStyle='#fff';x.fillText(new Date(b[0]*1e3).toISOString().slice(0,10)+'  C '+f(b[4]),8,16);x.fillText('O '+f(b[1])+' H '+f(b[2])+' L '+f(b[3]),8,29)}}
  const pick=e=>{const r=cv.getBoundingClientRect();hover=Math.max(0,Math.min(n-1,Math.floor((e.clientX-r.left)/((cv._w-54)/n))));draw()};
  cv.onpointerdown=cv.onpointermove=e=>{if(e.pointerType==='mouse'&&!e.buttons&&e.type==='pointermove'){pick(e);return}pick(e)};cv.onpointerleave=()=>{hover=null;draw()};
- cv._draw=draw;draw();obs(cv)}
+ cv._w=0;cv._draw=draw;draw();obs(cv)}
 function mkAn(p){const cv=$('#anc'),a=p.an;
  function draw(){sizeCv(cv);const x=cv.getContext('2d'),W=cv._w,H=cv._h;const all=a.now.concat(a.then);const lo=Math.min(...all)*.97,hi=Math.max(...all)*1.03,n=a.then.length;
-  const X=i=>i*(W-10)/(n-1)+5,Y=v=>6+(hi-v)/(hi-lo)*(H-20);x.clearRect(0,0,W,H);
+  const X=i=>i*(W-10)/(n-1)+5,Y=v=>6+(PFLIP?(v-lo):(hi-v))/(hi-lo)*(H-20);x.clearRect(0,0,W,H);
   x.strokeStyle='#666';x.setLineDash([3,3]);x.beginPath();x.moveTo(X(a.pre-1),0);x.lineTo(X(a.pre-1),H);x.stroke();x.setLineDash([]);
   const ln=(arr,c,w)=>{x.strokeStyle=c;x.lineWidth=w;x.beginPath();arr.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));x.stroke()};
   ln(a.then,'#9aa',1.5);ln(a.now.slice(-a.pre),'#ffd166',2);x.lineWidth=1;x.fillStyle='#889';x.font='10px system-ui';x.fillText('now',X(a.pre-1)-24,H-4);x.fillText('then → next 60d',X(a.pre-1)+4,H-4)}
