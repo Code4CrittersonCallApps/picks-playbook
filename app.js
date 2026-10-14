@@ -120,7 +120,7 @@ const EVTS=[new Date('2026-10-14T12:30:00Z'),new Date('2026-10-15T12:30:00Z'),ne
 const evWithin=hrs=>EVTS.find(t=>t-new Date()<hrs*36e5&&t-new Date()>-2*36e5);
 function ckLoad(){try{return JSON.parse(localStorage.getItem(CK_KEY))||{a:{},plan:{}}}catch(e){return{a:{},plan:{}}}}
 function ckSave(s){try{localStorage.setItem(CK_KEY,JSON.stringify(s))}catch(e){}}
-function prefill(sym,old){const s={a:{},sym,plan:{risk:old.plan&&old.plan.risk}};const A=s.a;const p=picks.find(x=>x.sym===sym),w=WB.watch.find(x=>x.sym===sym);
+function prefill(sym,old){const s={a:{},sym,plan:{risk:old.plan&&old.plan.risk}};const A=s.a;const p=picks.find(x=>x.sym===sym),w=WB.watch.find(x=>x.sym===sym)||(WB.extra||[]).find(x=>x.sym===sym);
  A.season=WB.btc>WB.btc50w?1:0;A.event48=evWithin(48)?0:1;
  const src=p||w;if(!src)return s;const px=src.px,e21=p?p.e21.at(-1):w.e21,e55=p?p.e55.at(-1):w.e55,rsi=src.drsi;
  A.gx=e21>e55?1:0;A.cool=rsi<75&&px<e21*1.1?1:0;A.pb=Math.abs(px/e21-1)<0.03?1:0;
@@ -132,7 +132,7 @@ function prefill(sym,old){const s={a:{},sym,plan:{risk:old.plan&&old.plan.risk}}
   if(!p){s.plan.entry=+(w.pull?w.e21:w.trig).toPrecision(5);s.plan.stop=+(w.pull?w.e55:w.zone[1]).toPrecision(5)}}
  return s}
 function check(){document.title='Pre-Trade Checklist';let s=ckLoad();s.a=s.a||{};s.plan=s.plan||{};
- const syms=[...new Set(picks.map(p=>p.sym).concat(WB.watch.map(w=>w.sym)))];
+ const syms=[...new Set(picks.map(p=>p.sym).concat(WB.watch.map(w=>w.sym)).concat((WB.extra||[]).map(w=>w.sym)))];
  const ic=v=>v===1?'✓':v===0?'✗':v===2?'½':'?',cl=v=>v===1?'ok':v===0?'no':v===2?'half':'';
  const row=([k,l])=>`<button class="ck ${cl(s.a[k])}" data-k="${k}"><span class=ci>${ic(s.a[k])}</span><span>${l}</span></button>`;
  const P=s.plan;
