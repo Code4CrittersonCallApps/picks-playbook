@@ -6,7 +6,7 @@ function status(p){if(p.etype==='trigger')return p.triggered?(p.Rlive<1.5?'Alrea
  return p.triggered?'At the boarding level (EMA21) — live':'Extended '+pct(p.px,p.entry)+' above boarding level — wait for pullback to EMA21'}
 function home(){document.title='Picks Playbook';
  let h=`<header><h1>Picks Playbook</h1><p class=sub>9 picks ranked · prices as of ${picks[0].asof} · BTC $${f(meta.btc)}</p></header>
- <div class=card warn><b>Tonight's risk:</b> CPI Wed Oct 14, 8:30 AM ET. BTC ${f(meta.btc)} sits between $80k support and the $87.4k reclaim. Under $80k → no new alt longs. Over $87.4k → alts get the green light.</div><ol class=rank>`;
+ <div class=card warn><b>Tonight's risk:</b> CPI Wed Oct 14, 8:30 AM ET. BTC ${f(meta.btc)} sits between $80k support and the $87.4k reclaim. Under $80k → no new alt longs. Over $87.4k → alts get the green light.</div><div class=dbtn><a href="#draft">🏈 Draft Board / Watch List</a><a href="#catalysts">📅 Catalysts</a></div><ol class=rank>`;
  picks.forEach((p,i)=>{h+=`<li><a href="#${p.sym}"><span class=n>${i+1}</span><div><b>${p.sym}</b> <span class="tag ${p.ctier}">${p.kind==='train'?'Train':p.ctier+' chart'}</span>${p.ftier?`<span class="tag box">${p.score}/5 boxes</span>`:''}<br><small>${where(p)} · R ${p.R0} · ${status(p)}</small></div></a></li>`});
  h+=`</ol><div class=card><b>QQQ (also a train):</b> $${f(meta.qqq.px)}, board ${f(meta.qqq.board)}, stop ${f(meta.qqq.stop)}, target ${f(meta.qqq.tgt)}, R ${meta.qqq.R}. Fine as the "boring" Schwab train; less room to run than the rest.</div>
  <div class=card><b>How the rank works:</b> chart tier (S=3, A/Train=2) + box score (out of 2) + reward/risk (max 2) + 1 if on both Ez Buys and Trains + 0.5 if all 4 train checks pass today. Analog matches are historical look-alikes, not predictions.</div><p class=foot>Built ${meta.built}. Not financial advice.</p>`;
@@ -79,5 +79,30 @@ function mkAn(p){const cv=$('#anc'),a=p.an;
  cv._draw=draw;draw();obs(cv)}
 const RO=new ResizeObserver(es=>requestAnimationFrame(()=>es.forEach(e=>{const c=e.target.querySelector('canvas');if(c&&c._draw&&c.parentElement.clientWidth!==c._w){c._w=0;c._draw()}})));
 function obs(cv){RO.observe(cv.parentElement)}
-function route(){RO.disconnect();const s=location.hash.slice(1),p=picks.find(q=>q.sym===s);p?lesson(p):home()}
+function route(){RO.disconnect();const s=location.hash.slice(1);if(s==='draft')return draft();if(s==='catalysts')return cats();const p=picks.find(q=>q.sym===s);p?lesson(p):home()}
 addEventListener('hashchange',route);route();
+function draft(){document.title='Draft Board · Picks Playbook';const{watch,cat}=WB;const g=(v)=>v==null?'—':f(v);
+ const L=(t,u)=>u?`<a href="${u}" target=_blank rel=noopener>${t}</a>`:t;
+ let h=`<nav><a href="#">← Picks</a><a href="#catalysts">Catalysts →</a></nav><h1>Draft Board</h1><p class=sub>Players to watch: strong fundamentals, not set up yet. Ranked like ADP: box score + trend (EMA stack, 200D, weekly) − distance to trigger. Prices ${watch[0].asof}.</p>`;
+ let rd=0;watch.forEach(w=>{if(w.round!==rd){rd=w.round;h+=`<h2>Round ${rd}${rd===1?' · closest to a buy':rd===2?' · needs work':' · deep sleepers'}</h2>`}
+  const above=w.zone[0]>w.px;
+  h+=`<div class=card><div class=wh><span class=n>${w.adp}</span><div><b>${w.sym}</b> $${g(w.px)} ${w.box!=null?`<span class="tag box">${w.box}/5</span>`:'<span class=tag>unscored</span>'} <span class="tag ${w.trend==='Uptrend'?'Train':''}">${w.trend}</span>${w.pull?' <span class="tag S">pullback wait</span>':''}</div></div>
+  <p class=small style="margin:6px 0"><b>What should it cost:</b> ${above?`price is already under its up-leg .618–.786 zone (${g(w.zone[0])}–${g(w.zone[1])}); no fib support until the 365d swing levels below`:`buy zone <b class=grn>${g(w.zone[0])} – ${g(w.zone[1])}</b>`}${w.sym==='BTC'?' (STH cost basis $74.3k → $80k)':w.pull?' (EMA55 → EMA21)':' (.786 → .618 of the up-leg)'}</p>
+  <p class=small style="margin:6px 0"><b>Promotes to a buy:</b> ${w.tt}${w.pull?'':` — ${w.dist>0?'+':''}${w.dist}% away`}</p>
+  <details><summary>Stats & models</summary><table class=plan>
+  <tr><td>Fib zones</td><td>Up-leg ${g(w.uL)}→${g(w.uH)}: .618 ${g(w.uz['0.618'])} · .702 ${g(w.uz['0.702'])} · .786 ${g(w.uz['0.786'])}<br>${w.short?'Full history':'365d'} swing ${g(w.L)}→${g(w.H)}: .618 ${g(w.fz['0.618'])} · .702 ${g(w.fz['0.702'])} · .786 ${g(w.fz['0.786'])}</td></tr>
+  <tr><td>200D / breakout</td><td>200D ${g(w.m200)} (${w.m200?(w.px>w.m200?'above':'below'):'n/a'}) · prior range high ${g(w.brk)}${w.brk&&w.px>w.brk?' — retest = support':''}</td></tr>
+  <tr><td>Trend</td><td>Daily: EMA21 ${g(w.e21)} ${w.stack?'>':'<'} EMA55 ${g(w.e55)} · RSI ${w.drsi}<br>Weekly: ${w.wk_ok?'above':'below'} 21W EMA ${g(w.w21)}</td></tr>
+  <tr><td>Expected range</td><td>Vol ${w.sig}%/yr → 30d 1σ ${g(w.rng['30'][0])}–${g(w.rng['30'][1])}; 90d ${g(w.rng['90'][0])}–${g(w.rng['90'][1])} (≈68% odds, not a forecast)</td></tr>
+  <tr><td>Corr to BTC</td><td>${w.sym==='BTC'?'—':w.cor+' (90d daily)'}${w.sym==='CC'?' — CoinGecko daily closes, short history':''}</td></tr>
+  <tr><td>Analogs</td><td>${w.an?`${w.an.n} past look-alikes: avg +30d ${w.an.f30}%, +60d ${w.an.f60}%, ${w.an.up}/${w.an.n} up after 60d. Historical, not a prediction.`:'No analog set in Chart Caller.'}</td></tr>
+  <tr><td>Models</td><td>${w.model?w.model.map(m=>L(m[0],m[1])+` (${m[2]})`).join('<br>'):'No credible published target found; skipped rather than guessed.'}</td></tr>
+  <tr><td>ETF flows</td><td>${w.flow?L(w.flow[0],w.flow[1]):'No US spot ETF flow data'}</td></tr>
+  <tr><td>Unlocks</td><td>${w.unlock?L(w.unlock[0],w.unlock[1]):'No unlock checked/none listed'}</td></tr>
+  <tr><td>Boxes</td><td>${w.ev||'—'}${w.src?'<br><span class=small>Src: '+w.src+'</span>':''}</td></tr></table></details></div>`});
+ h+=`<p class=foot>Zones/ranges computed from Yahoo Finance daily candles (CC, GRAM: CoinGecko daily closes). Analogs are historical. Not financial advice.</p>`;
+ $('#app').innerHTML=h;scrollTo(0,0)}
+function cats(){document.title='Catalysts · Picks Playbook';const{cat}=WB;
+ let h=`<nav><a href="#draft">← Draft Board</a><a href="#">Picks</a></nav><h1>Things that change everything</h1><p class=sub>Trade-deadline calendar. Times ET. Each line: what a bull or bear outcome does to the watch list.</p>`;
+ cat.forEach(c=>{h+=`<div class=card><div class=cd><b>${c[0]}</b> <span class=small>${c[1]}</span></div><b>${c[2]}</b><p class=small style="margin:6px 0"><span class=grn>▲ ${c[4]}</span><br><span class=red>▼ ${c[5]}</span></p><a class=small href="${c[3]}" target=_blank rel=noopener>source</a></div>`});
+ $('#app').innerHTML=h+'<p class=foot>Sources checked Oct 13, 2026.</p>';scrollTo(0,0)}
