@@ -6,7 +6,7 @@ function status(p){if(p.etype==='trigger')return p.triggered?(p.Rlive<1.5?'Alrea
  return p.triggered?'At the boarding level (EMA21) — live':'Extended '+pct(p.px,p.entry)+' above boarding level — wait for pullback to EMA21'}
 function home(){document.title='Picks Playbook';
  let h=`<header><h1>Picks Playbook</h1><p class=sub>9 picks ranked · prices as of ${picks[0].asof} · BTC $${f(meta.btc)}</p></header>
- <div class=card warn><b>Tonight's risk:</b> CPI Wed Oct 14, 8:30 AM ET. BTC ${f(meta.btc)} sits between $80k support and the $87.4k reclaim. Under $80k → no new alt longs. Over $87.4k → alts get the green light.</div>${ochome()}<div class=dbtn><a href="#draft">🏈 Draft Board / Watch List</a><a href="#catalysts">📅 Catalysts</a></div><div class=dbtn style="margin-top:8px"><a href="#scan">🔎 Uphold full scan (all assets)</a><a href="#gold">🥇 Gold &amp; Hedges</a></div><ol class=rank>`;
+ <div class=card warn><b>Tonight's risk:</b> CPI Wed Oct 14, 8:30 AM ET. BTC ${f(meta.btc)} sits between $80k support and the $87.4k reclaim. Under $80k → no new alt longs. Over $87.4k → alts get the green light.</div>${ochome()}<a class=topbtn href="#check">🚂 Pre-Trade Checklist · Is it a train? / Board it</a><div class=dbtn><a href="#draft">🏈 Draft Board / Watch List</a><a href="#catalysts">📅 Catalysts</a></div><div class=dbtn style="margin-top:8px"><a href="#scan">🔎 Uphold full scan (all assets)</a><a href="#gold">🥇 Gold &amp; Hedges</a></div><ol class=rank>`;
  picks.forEach((p,i)=>{h+=`<li><a href="#${p.sym}"><span class=n>${i+1}</span><div><b>${p.sym}</b> <span class="tag ${p.ctier}">${p.kind==='train'?'Train':p.ctier+' chart'}</span>${p.ftier?`<span class="tag box">${p.score}/5 boxes</span>`:''}<br><small>${where(p)} · R ${p.R0} · ${status(p)}</small></div></a></li>`});
  h+=`</ol><div class=card><b>QQQ (also a train):</b> $${f(meta.qqq.px)}, board ${f(meta.qqq.board)}, stop ${f(meta.qqq.stop)}, target ${f(meta.qqq.tgt)}, R ${meta.qqq.R}. Fine as the "boring" Schwab train; less room to run than the rest.</div>
  <div class=card><b>How the rank works:</b> chart tier (S=3, A/Train=2) + box score (out of 2) + reward/risk (max 2) + 1 if on both Ez Buys and Trains + 0.5 if all 4 train checks pass today. Analog matches are historical look-alikes, not predictions.</div><p class=foot>Built ${meta.built}. Not financial advice.</p>`;
@@ -83,8 +83,7 @@ function ocsec(sym){const o=(window.OC||{}).assets&&OC.assets[sym];if(!o)return'
 return `<section><h2>On-chain &amp; smart money</h2><p><b style="color:${c}">${o.tag}</b> <small>· ${OC.asof}</small></p><p class=small>${o.sum}</p><ul class=small style="padding-left:18px">${o.ev.map(([k,t,u,d])=>`<li style="margin-bottom:6px"><b>${k}:</b> ${t} <a href="${u}" target=_blank rel=noopener>source</a> <small>(${d})</small></li>`).join('')}</ul></section>`}
 function ocpage(sym){document.title=sym+' on-chain';$('#app').innerHTML=`<nav><a href="#">← All picks</a><span>Watch list</span></nav><section class="card verdict"><h1>${sym}</h1><p>Schwab/Uphold watch-list coin, on-chain check only (no chart lesson yet).</p></section>`+ocsec(sym);scrollTo(0,0)}
 function ochome(){return `<div class=card><b>On-chain check (${OC.asof}):</b> ${Object.entries(OC.assets).map(([k,o])=>`<a href="#${picks.find(p=>p.sym===k)?k:'oc-'+k}">${k}</a> ${o.v==='confirms'?'✅':o.v==='neutral'?'🟡':'🔴'}`).join(' · ')}</div>`}
-function route(){RO.disconnect();const s=location.hash.slice(1);if(s==='scan')return scanpage();if(s==='gold')return goldpage();if(s==='draft')return draft();if(s==='catalysts')return cats();if(s.startsWith('oc-'))return ocpage(s.slice(3));const p=picks.find(q=>q.sym===s);p?lesson(p):home()}
-addEventListener('hashchange',route);route();
+function route(){RO.disconnect();const s=location.hash.slice(1);if(s==='scan')return scanpage();if(s==='gold')return goldpage();if(s==='draft')return draft();if(s==='check')return check();if(s==='catalysts')return cats();if(s.startsWith('oc-'))return ocpage(s.slice(3));const p=picks.find(q=>q.sym===s);p?lesson(p):home()}
 function draft(){document.title='Draft Board · Picks Playbook';const{watch,cat}=WB;const g=(v)=>v==null?'—':f(v);
  const L=(t,u)=>u?`<a href="${u}" target=_blank rel=noopener>${t}</a>`:t;
  let h=`<nav><a href="#">← Picks</a><a href="#catalysts">Catalysts →</a></nav><h1>Draft Board</h1><p class=sub>Players to watch: strong fundamentals, not set up yet. Ranked like ADP: box score + trend (EMA stack, 200D, weekly) − distance to trigger. Prices ${watch[0].asof}.</p>`;
@@ -110,3 +109,60 @@ function cats(){document.title='Catalysts · Picks Playbook';const{cat}=WB;
  let h=`<nav><a href="#draft">← Draft Board</a><a href="#">Picks</a></nav><h1>Things that change everything</h1><p class=sub>Trade-deadline calendar. Times ET. Each line: what a bull or bear outcome does to the watch list.</p>`;
  cat.forEach(c=>{h+=`<div class=card><div class=cd><b>${c[0]}</b> <span class=small>${c[1]}</span></div><b>${c[2]}</b><p class=small style="margin:6px 0"><span class=grn>▲ ${c[4]}</span><br><span class=red>▼ ${c[5]}</span></p><a class=small href="${c[3]}" target=_blank rel=noopener>source</a></div>`});
  $('#app').innerHTML=h+'<p class=foot>Sources checked Oct 13, 2026.</p>';scrollTo(0,0)}
+const CK_KEY='pb-check-v2';
+const TRAIN=[['hh','Higher highs & higher lows'],['ema','Daily EMA21 > EMA55 and EMA21 rising'],['brk','Fresh breakout (new 60-bar high)'],['vol','Volume expanding on the breakout'],['rs','Relative strength vs BTC rising'],['lag','Leader already pumped (pump-timing lag favors this one)']];
+const BOARD=[['pb','Pullback to daily EMA21 — 1st or 2nd touch'],['cool','Not extended: RSI < 75 and < 10% above EMA21']];
+const SEC=[['Season / macro (BCB)',[['season','BTC above its 50-week MA (MUST)'],['fibs','Macro fibs OK (not losing .702/.786)'],['event48','No CPI/FOMC within 48h'],['ladder','Money-flow ladder stage reached (BTC → ETH → large caps → this)'],['dxy','Dollar & yields falling/flat'],['regime','Regime = bull (not bear, not euphoria)']]],
+['Odds (Krown)',[['wmom','Weekly momentum up (Stoch RSI / RSI > 50)'],['gx','EMA golden cross in place'],['analog','Historical analogs mostly up (≥60%)']]],
+['Ticket boxes (need 3+ of 5)',[['bUSA','USA-based / US-friendly'],['bISO','ISO 20022 / VC / institution "knighted"'],['bSEC','RWA / gaming / AI'],['bOC','On-chain proof (not a shell)'],['bNET','Network effect (real partners)']]],
+['On-chain / smart money',[['etf','ETF flows not bleeding'],['whale','Whales accumulating'],['fund','Funding flat/negative (squeeze fuel)'],['unl','No big unlock in next 2 weeks']]]];
+const EVTS=[new Date('2026-10-14T12:30:00Z'),new Date('2026-10-15T12:30:00Z'),new Date('2026-10-28T18:00:00Z'),new Date('2026-11-06T13:30:00Z'),new Date('2026-11-10T13:30:00Z')];
+const evWithin=hrs=>EVTS.find(t=>t-new Date()<hrs*36e5&&t-new Date()>-2*36e5);
+function ckLoad(){try{return JSON.parse(localStorage.getItem(CK_KEY))||{a:{},plan:{}}}catch(e){return{a:{},plan:{}}}}
+function ckSave(s){try{localStorage.setItem(CK_KEY,JSON.stringify(s))}catch(e){}}
+function prefill(sym,old){const s={a:{},sym,plan:{risk:old.plan&&old.plan.risk}};const A=s.a;const p=picks.find(x=>x.sym===sym),w=WB.watch.find(x=>x.sym===sym);
+ A.season=WB.btc>WB.btc50w?1:0;A.event48=evWithin(48)?0:1;
+ const src=p||w;if(!src)return s;const px=src.px,e21=p?p.e21.at(-1):w.e21,e55=p?p.e55.at(-1):w.e55,rsi=src.drsi;
+ A.gx=e21>e55?1:0;A.cool=rsi<75&&px<e21*1.1?1:0;A.pb=Math.abs(px/e21-1)<0.03?1:0;
+ if(p){const c=Object.values(p.crit);A.brk=c[0]?1:0;A.ema=c[1]&&c[3]?1:0;const hl=p.lab.slice(-4);A.hh=hl.filter(l=>l[2]==='HH'||l[2]==='HL').length>=3?1:0;
+  if(p.wrsi!=null)A.wmom=p.wrsi>50?1:0;if(p.an)A.analog=p.an.f60>0?1:0;
+  if(p.boxes)['bUSA','bISO','bSEC','bOC','bNET'].forEach((k,i)=>{const v=p.boxes[i][1];A[k]=v==='✓'?1:v==='½'?2:0});
+  s.plan.entry=+p.entry.toPrecision(5);s.plan.stop=+p.stop.toPrecision(5);s.plan.tgt=+p.tgt.toPrecision(5)}
+ if(w){A.ema=w.stack&&e21>0?A.ema??(w.stack?1:0):0;if(w.an)A.analog=w.an.up/w.an.n>=.6?1:0;if(w.flow)A.etf=/−|outflow/.test(w.flow[0])?0:1;
+  if(!p){s.plan.entry=+(w.pull?w.e21:w.trig).toPrecision(5);s.plan.stop=+(w.pull?w.e55:w.zone[1]).toPrecision(5)}}
+ return s}
+function check(){document.title='Pre-Trade Checklist';let s=ckLoad();s.a=s.a||{};s.plan=s.plan||{};
+ const syms=[...new Set(picks.map(p=>p.sym).concat(WB.watch.map(w=>w.sym)))];
+ const ic=v=>v===1?'✓':v===0?'✗':v===2?'½':'?',cl=v=>v===1?'ok':v===0?'no':v===2?'half':'';
+ const row=([k,l])=>`<button class="ck ${cl(s.a[k])}" data-k="${k}"><span class=ci>${ic(s.a[k])}</span><span>${l}</span></button>`;
+ const P=s.plan;
+ let h=`<nav><a href="#">← Picks</a><a href="#check" id=ckreset>Reset</a></nav><h1>Pre-Trade Checklist</h1>
+ <p class=sub>Tap: ? → ✓ → ✗. Saved on this phone. Prefill fills what the data knows; confirm the rest yourself.</p>
+ <div class=card><label class=small>Prefill from asset</label><select id=cksym><option value="">— pick —</option>${syms.map(x=>`<option ${x===s.sym?'selected':''}>${x}</option>`).join('')}</select></div>
+ <div id=ckv></div>
+ <section class="card star"><h2>🚂 Is it a train?</h2><div id=trs></div>${TRAIN.map(row).join('')}</section>
+ <section class="card star"><h2>🎟️ Board the train</h2>${BOARD.map(row).join('')}<div id=auto></div>
+ <div class=grid>${[['entry','Entry (EMA21 / trigger)'],['stop','Stop (below EMA21 / swing low)'],['tgt','Target'],['risk','Risk $ per trade']].map(([k,l])=>`<label>${l}<input inputmode=decimal data-p="${k}" value="${P[k]??''}"></label>`).join('')}</div><div id=calc></div></section>
+ <h2 class=sech>Secondary filters</h2>${SEC.map(([t,it])=>`<details class=card><summary>${t} <span class=small id="sum-${t.split(' ')[0]}"></span></summary>${it.map(row).join('')}</details>`).join('')}`;
+ $('#app').innerHTML=h;scrollTo(0,0);
+ const upd=()=>{const A=s.a,P=s.plan,e=+P.entry,st=+P.stop,t=+P.tgt,r=+P.risk;const R=e&&st&&t&&e>st?(t-e)/(e-st):null;const ev=evWithin(24);
+  const tn=TRAIN.filter(i=>A[i[0]]===1).length;const core=['hh','ema','brk'].every(k=>A[k]===1);
+  $('#trs').innerHTML=`<p class="small ${core?'grn':'red'}">${tn}/6 · core (HH/HL, EMA stack, breakout) ${core?'pass — it is a train':'not all pass'}</p>`;
+  const boxes=['bUSA','bISO','bSEC','bOC','bNET'].reduce((n,k)=>n+(A[k]===1?1:A[k]===2?.5:0),0);
+  const auto=[['Stop defined below entry',!!(e&&st&&st<e)],['Room ≥ 2R'+(R?` (R = ${R.toFixed(2)})`:''),R!=null&&R>=2],['No CPI/FOMC/jobs in 24h'+(ev?` — next ${ev.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})} ET`:''),!ev]];
+  $('#auto').innerHTML=auto.map(m=>`<div class="ck auto ${m[1]?'ok':'no'}"><span class=ci>${m[1]?'✓':'✗'}</span><span>${m[0]} <small>(auto)</small></span></div>`).join('');
+  const board=A.pb===1&&A.cool===1;
+  const must=[['Season: BTC > 50W MA ($'+f(WB.btc50w)+')',A.season===1],['It is a train (core 3) or trigger hit',core],['Boarding: EMA21 pullback, not extended',board],...auto];
+  const fails=must.filter(m=>!m[1]);const v=fails.length===0&&boxes>=3?'GO':(A.season===0||(R!=null&&R<1)||A.ema===0)?'NO':'WAIT';
+  const size=e&&st&&r&&e>st?r/(e-st):null;
+  $('#calc').innerHTML=`<table class=plan><tr><td>Position size</td><td>${size?`<b>${size.toLocaleString('en-US',{maximumFractionDigits:size<10?3:0})} units ≈ $${(size*e).toLocaleString('en-US',{maximumFractionDigits:0})}</b><br><small>risk $ ÷ (entry − stop)</small>`:'enter entry, stop, risk $'}</td></tr>
+  <tr><td>Sell ⅓</td><td>${e&&st&&e>st?f(2*e-st)+' (+1R) → move stop to breakeven':'—'}</td></tr><tr><td>Sell ⅓</td><td>${t?f(t)+' (target)':'—'}</td></tr><tr><td>Last ⅓</td><td>Trail: sell on daily close below EMA21</td></tr></table>`;
+  $('#ckv').innerHTML=`<div class="card v${v}"><div class=vbig>${v}${s.sym?' · '+s.sym:''}</div><p class="small" style="text-align:center">Boxes ${boxes}/5${boxes<3?' (need 3+ for GO)':''}</p><ul class=crit>${must.map(m=>`<li class=${m[1]?'ok':'no'}>${m[1]?'✓':'✗'} ${m[0]}</li>`).join('')}</ul></div>`;
+  SEC.forEach(([t,it])=>{const el=document.getElementById('sum-'+t.split(' ')[0]);if(el)el.textContent=it.filter(i=>A[i[0]]===1).length+'/'+it.length+' ✓'})};
+ $('#app').onclick=e=>{const b=e.target.closest('button.ck');if(b){const k=b.dataset.k,v=s.a[k];if(v==null)s.a[k]=1;else if(v===1)s.a[k]=0;else delete s.a[k];ckSave(s);b.className='ck '+cl(s.a[k]);b.querySelector('.ci').textContent=ic(s.a[k]);upd()}
+  if(e.target.id==='ckreset'){e.preventDefault();localStorage.removeItem(CK_KEY);check()}};
+ $('#app').oninput=e=>{const k=e.target.dataset.p;if(k){s.plan[k]=e.target.value;ckSave(s);upd()}};
+ $('#cksym').onchange=e=>{if(e.target.value){s=prefill(e.target.value,s);ckSave(s);check()}};
+ upd()}
+
+addEventListener('hashchange',route);route();
