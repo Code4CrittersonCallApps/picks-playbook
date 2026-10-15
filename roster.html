@@ -18,4 +18,4 @@ $('list').innerHTML=L.map((r,i)=>`<div class=c><div class=top><div><span class=s
 L.forEach((r,i)=>{const c=$('s'+i),d=devicePixelRatio||1,w=c.clientWidth,h=46;c.width=w*d;c.height=h*d;const g=c.getContext('2d');g.scale(d,d);const v=r.spark,mn=Math.min(...v),mx=Math.max(...v);
  g.strokeStyle=v.at(-1)>=v[0]?'#3fb950':'#f85149';g.lineWidth=2;g.beginPath();v.forEach((x,k)=>{const X=k/(v.length-1)*w,Y=h-3-(x-mn)/(mx-mn||1)*(h-6);k?g.lineTo(X,Y):g.moveTo(X,Y)});g.stroke()})}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{F=b.dataset.f;document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x==b));draw()});draw();addEventListener('resize',draw);
-</script></body></html>
+</script><script src="https://code4crittersoncallapps.github.io/market-universe/nav.js" defer></script></body></html>

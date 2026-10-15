@@ -22,4 +22,4 @@ const G=[
 ['Capitulation','Forced, emotional, everybody-out selling that marks a washout low.','"A real capitulation shows a volume flush and long wicks, not just a red day."','A volume spike · long lower wicks · RSI < 25 · MVRV ≤ ~1 · price under the 200W · funding deeply negative']];
 function draw(f=''){f=f.toLowerCase();document.getElementById('g').innerHTML=G.filter(x=>x.join(' ').toLowerCase().includes(f)).map(x=>`<div class=c><div class=t>${x[0]}</div><div>${x[1]}</div><div class=say>${x[2]}</div><div class=p><b>PROOF ON THE CHART</b><br>${x[3]}</div></div>`).join('')}
 document.getElementById('q').oninput=e=>draw(e.target.value);draw();
-</script></body></html>
+</script><script src="https://code4crittersoncallapps.github.io/market-universe/nav.js" defer></script></body></html>
